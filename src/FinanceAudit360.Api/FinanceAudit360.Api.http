@@ -1,0 +1,218 @@
+@FinanceAudit360_HostAddress = http://localhost:5080
+
+### Sign in. Copy accessToken from the response into @token below.
+# @name login
+POST {{FinanceAudit360_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "userNameOrEmail": "admin",
+  "password": "ChangeMe#2024!"
+}
+
+###
+@token = {{login.response.body.data.accessToken}}
+@refreshToken = {{login.response.body.data.refreshToken}}
+
+### Who am I
+GET {{FinanceAudit360_HostAddress}}/api/auth/me
+Authorization: Bearer {{token}}
+
+### Rotate the token pair
+POST {{FinanceAudit360_HostAddress}}/api/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### Dashboard - last 30 days
+GET {{FinanceAudit360_HostAddress}}/api/dashboard/summary?period=Last30Days
+Authorization: Bearer {{token}}
+
+### Dashboard - custom range
+GET {{FinanceAudit360_HostAddress}}/api/dashboard/summary?period=Custom&from=2024-01-01&to=2024-12-31
+Authorization: Bearer {{token}}
+
+### Transaction search - everything
+POST {{FinanceAudit360_HostAddress}}/api/transactions/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "pageNumber": 1,
+  "pageSize": 25,
+  "sortBy": "TransactionDate",
+  "sortDirection": 1
+}
+
+### Transaction search - debits over 1000 in a date range, grouped by vendor
+POST {{FinanceAudit360_HostAddress}}/api/transactions/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "pageNumber": 1,
+  "pageSize": 50,
+  "dateFrom": "2024-01-01",
+  "dateTo": "2024-12-31",
+  "amountFrom": 1000,
+  "debitOnly": true,
+  "groupBy": "vendor"
+}
+
+### Transaction search - keyword across description, reference, vendor and person
+POST {{FinanceAudit360_HostAddress}}/api/transactions/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "pageNumber": 1,
+  "pageSize": 25,
+  "keyword": "amazon"
+}
+
+### Create a manual transaction
+POST {{FinanceAudit360_HostAddress}}/api/transactions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "transactionDate": "2024-05-02",
+  "amount": 1250.75,
+  "direction": 2,
+  "transactionType": 2,
+  "description": "Manual entry - office supplies",
+  "referenceNumber": "MANUAL-0001",
+  "currency": "INR"
+}
+
+### Export the filtered set as CSV
+POST {{FinanceAudit360_HostAddress}}/api/transactions/export
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "pageNumber": 1,
+  "pageSize": 500,
+  "dateFrom": "2024-01-01"
+}
+
+### Upload a statement (replace the path with a real PDF)
+POST {{FinanceAudit360_HostAddress}}/api/statements/upload
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=FinanceAudit360Boundary
+
+--FinanceAudit360Boundary
+Content-Disposition: form-data; name="file"; filename="statement.pdf"
+Content-Type: application/pdf
+
+< ./samples/statement.pdf
+--FinanceAudit360Boundary--
+
+### Process an uploaded statement (supply the password if it is protected)
+POST {{FinanceAudit360_HostAddress}}/api/statements/process
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "uploadId": "00000000-0000-0000-0000-000000000000",
+  "password": null,
+  "allowDuplicate": false
+}
+
+### Upload history
+POST {{FinanceAudit360_HostAddress}}/api/statements/uploads/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "pageNumber": 1,
+  "pageSize": 20
+}
+
+### Create a person
+POST {{FinanceAudit360_HostAddress}}/api/persons
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Ravi Kumar",
+  "mobile": "9876543210",
+  "email": "ravi@example.com",
+  "relationship": "Friend",
+  "matchKeywords": "RAVI|RAVIKUMAR"
+}
+
+### Search people
+POST {{FinanceAudit360_HostAddress}}/api/persons/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "pageNumber": 1,
+  "pageSize": 25,
+  "hasOutstanding": true
+}
+
+### Record money given to a person
+POST {{FinanceAudit360_HostAddress}}/api/persons/00000000-0000-0000-0000-000000000000/ledger
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "entryDate": "2024-05-02",
+  "amount": 5000,
+  "entryType": 1,
+  "description": "Cash lent"
+}
+
+### Person audit (given, taken, balance, timeline)
+GET {{FinanceAudit360_HostAddress}}/api/persons/00000000-0000-0000-0000-000000000000/audit
+Authorization: Bearer {{token}}
+
+### Lookups used by the filter panels
+GET {{FinanceAudit360_HostAddress}}/api/lookups/banks
+Authorization: Bearer {{token}}
+
+###
+GET {{FinanceAudit360_HostAddress}}/api/lookups/enums
+Authorization: Bearer {{token}}
+
+### Masters - banks
+POST {{FinanceAudit360_HostAddress}}/api/masters/banks/search
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "pageNumber": 1,
+  "pageSize": 25
+}
+
+### Reports - monthly activity
+GET {{FinanceAudit360_HostAddress}}/api/reports/monthly-activity?from=2024-01-01&to=2024-12-31
+Authorization: Bearer {{token}}
+
+### Reports - spend by vendor
+POST {{FinanceAudit360_HostAddress}}/api/reports/spend-by-vendor
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "from": "2024-01-01",
+  "to": "2024-12-31",
+  "topN": 10
+}
+
+### Reports - audit log (administrators only)
+POST {{FinanceAudit360_HostAddress}}/api/reports/audit-logs
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "pageNumber": 1,
+  "pageSize": 50
+}
+
+### Health probe (anonymous)
+GET {{FinanceAudit360_HostAddress}}/health

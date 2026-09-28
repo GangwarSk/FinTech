@@ -1,0 +1,64 @@
+name: financeaudit360
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: financeaudit360-postgres
+    environment:
+      POSTGRES_DB: FinanceAudit360
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U postgres -d FinanceAudit360 || exit 1
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  api:
+    build:
+      context: .
+      dockerfile: src/FinanceAudit360.Api/Dockerfile
+    container_name: financeaudit360-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=FinanceAudit360;Username=postgres;Password=${POSTGRES_PASSWORD}"
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?Set JWT_SIGNING_KEY in .env}
+      Jwt__Issuer: FinanceAudit360
+      Jwt__Audience: FinanceAudit360.Client
+      Security__SeedAdminPassword: ${SEED_ADMIN_PASSWORD:?Set SEED_ADMIN_PASSWORD in .env}
+      Security__AllowedCorsOrigins__0: "http://localhost:8081"
+      FileStorage__RootPath: /app/App_Data/storage
+      Database__AutoMigrateOnStartup: "true"
+    ports:
+      - "8080:8080"
+    volumes:
+      - storage:/app/App_Data/storage
+      - logs:/app/App_Data/logs
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: /api
+    container_name: financeaudit360-web
+    depends_on:
+      - api
+    ports:
+      - "8081:8080"
+
+volumes:
+  pgdata:
+  storage:
+  logs:

@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>FinanceAudit360.Contracts</RootNamespace>
+    <AssemblyName>FinanceAudit360.Contracts</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FinanceAudit360.Shared\FinanceAudit360.Shared.csproj" />
+  </ItemGroup>
+</Project>

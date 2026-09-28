@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>FinanceAudit360.Shared</RootNamespace>
+    <AssemblyName>FinanceAudit360.Shared</AssemblyName>
+  </PropertyGroup>
+</Project>

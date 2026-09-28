@@ -1,0 +1,124 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design tokens mirror the Zeto-React foundation theme: indigo primary, emerald accent, slate neutrals. */
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --primary: 243 75% 59%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 215 25% 27%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 245 58% 51%;
+    --destructive: 347 77% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 161 94% 30%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 222 47% 11%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 243 75% 59%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 220 13% 91%;
+    --card: 221 39% 11%;
+    --card-foreground: 220 13% 91%;
+    --primary: 234 89% 74%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 220 13% 91%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 351 95% 71%;
+    --destructive-foreground: 350 50% 8%;
+    --success: 158 64% 52%;
+    --success-foreground: 222 47% 11%;
+    --warning: 43 96% 56%;
+    --warning-foreground: 222 47% 11%;
+    --border: 215 25% 27%;
+    --input: 215 25% 27%;
+    --ring: 234 89% 74%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'DM Sans', sans-serif;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply text-foreground;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+    background:
+      radial-gradient(circle at top left, rgba(79, 70, 229, 0.16), transparent 34rem),
+      radial-gradient(circle at bottom right, rgba(5, 150, 105, 0.12), transparent 32rem),
+      hsl(var(--background));
+    background-attachment: fixed;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: 'Manrope', 'DM Sans', sans-serif;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: inherit;
+    transition: background-color 9999s ease-in-out 0s;
+  }
+
+  /* Tabular figures keep currency columns aligned in the grids. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  .brand-gradient {
+    @apply bg-gradient-to-r from-indigo-600 to-emerald-600 text-white shadow-lg shadow-indigo-600/20;
+  }
+
+  .glass-surface {
+    @apply border-slate-200/70 bg-white/80 backdrop-blur-md dark:border-slate-700/60 dark:bg-slate-950/75;
+  }
+
+  .eyebrow {
+    @apply mb-1.5 text-[0.72rem] font-extrabold uppercase tracking-[0.11em] text-primary;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-muted-foreground/30;
+  }
+}

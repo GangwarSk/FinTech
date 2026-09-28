@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>FinanceAudit360.Tests</RootNamespace>
+    <AssemblyName>FinanceAudit360.Tests</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <OutputType>Exe</OutputType>
+    <!-- xUnit v3 runs on Microsoft.Testing.Platform, which the .NET 10 SDK requires us to opt into. -->
+    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FinanceAudit360.Api\FinanceAudit360.Api.csproj" />
+    <ProjectReference Include="..\FinanceAudit360.Application\FinanceAudit360.Application.csproj" />
+    <ProjectReference Include="..\FinanceAudit360.Domain\FinanceAudit360.Domain.csproj" />
+    <ProjectReference Include="..\FinanceAudit360.Infrastructure\FinanceAudit360.Infrastructure.csproj" />
+    <ProjectReference Include="..\FinanceAudit360.Persistence\FinanceAudit360.Persistence.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Microsoft.AspNetCore.Hosting" />
+    <Using Include="Microsoft.Extensions.DependencyInjection" />
+  </ItemGroup>
+</Project>

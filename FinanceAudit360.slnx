@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/Api/">
+    <Project Path="src/FinanceAudit360.Api/FinanceAudit360.Api.csproj" />
+    <Project Path="src/FinanceAudit360.Application/FinanceAudit360.Application.csproj" />
+    <Project Path="src/FinanceAudit360.Domain/FinanceAudit360.Domain.csproj" />
+    <Project Path="src/FinanceAudit360.Infrastructure/FinanceAudit360.Infrastructure.csproj" />
+    <Project Path="src/FinanceAudit360.Persistence/FinanceAudit360.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/Shared/">
+    <Project Path="src/FinanceAudit360.Contracts/FinanceAudit360.Contracts.csproj" />
+    <Project Path="src/FinanceAudit360.Shared/FinanceAudit360.Shared.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="src/FinanceAudit360.Tests/FinanceAudit360.Tests.csproj" />
+  </Folder>
+</Solution>
