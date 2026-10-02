@@ -5,6 +5,7 @@ using FinanceAudit360.Domain.Common;
 using FinanceAudit360.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FinanceAudit360.Persistence;
 
@@ -57,6 +58,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         ApplySoftDeleteQueryFilters(modelBuilder);
         ApplyDecimalPrecision(modelBuilder);
+        ApplyUtcDateTimeConversion(modelBuilder);
         ApplyClientGeneratedKeys(modelBuilder);
 
         base.OnModelCreating(modelBuilder);
@@ -114,6 +116,37 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         {
             property.SetPrecision(18);
             property.SetScale(2);
+        }
+    }
+
+    /// <summary>
+    /// PostgreSQL maps <see cref="DateTime"/> to "timestamp with time zone", and Npgsql refuses to write a
+    /// value whose <see cref="DateTimeKind"/> is not UTC. Domain values arrive as Unspecified (business dates
+    /// parsed from statements and request payloads), so every DateTime property is converted to UTC on the way
+    /// in and materialised back as a UTC value on the way out.
+    /// </summary>
+    private static void ApplyUtcDateTimeConversion(ModelBuilder modelBuilder)
+    {
+        var converter = new ValueConverter<DateTime, DateTime>(
+            value => value.Kind == DateTimeKind.Utc ? value : DateTime.SpecifyKind(value, DateTimeKind.Utc),
+            value => DateTime.SpecifyKind(value, DateTimeKind.Utc));
+
+        var nullableConverter = new ValueConverter<DateTime?, DateTime?>(
+            value => value.HasValue
+                ? (value.Value.Kind == DateTimeKind.Utc ? value : DateTime.SpecifyKind(value.Value, DateTimeKind.Utc))
+                : value,
+            value => value.HasValue ? DateTime.SpecifyKind(value.Value, DateTimeKind.Utc) : value);
+
+        foreach (var property in modelBuilder.Model.GetEntityTypes().SelectMany(t => t.GetProperties()))
+        {
+            if (property.ClrType == typeof(DateTime))
+            {
+                property.SetValueConverter(converter);
+            }
+            else if (property.ClrType == typeof(DateTime?))
+            {
+                property.SetValueConverter(nullableConverter);
+            }
         }
     }
 }

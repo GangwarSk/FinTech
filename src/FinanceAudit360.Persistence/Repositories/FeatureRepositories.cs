@@ -1,4 +1,4 @@
-using FinanceAudit360.Application.Common.Extensions;
+﻿using FinanceAudit360.Application.Common.Extensions;
 using FinanceAudit360.Application.Common.Interfaces;
 using FinanceAudit360.Application.Common.Mappings;
 using FinanceAudit360.Application.Features.Statements;
@@ -304,7 +304,7 @@ public sealed class StatementFileRepository(ApplicationDbContext context)
         var deleted = filter.DeletedOnly;
         var keyword = filter.Keyword?.Trim().ToUpperInvariant();
 
-        var query = context.StatementFiles
+        var query = Context.StatementFiles
             .IgnoreQueryFilters()
             .AsNoTracking()
             .Where(f => f.IsDeleted == deleted)
@@ -313,7 +313,7 @@ public sealed class StatementFileRepository(ApplicationDbContext context)
         // Bank and period live on the statement, so those filters become an EXISTS over matching statements.
         if (filter.BankIds is { Count: > 0 } || filter.PeriodFrom.HasValue || filter.PeriodTo.HasValue)
         {
-            var matching = context.Statements
+            var matching = Context.Statements
                 .IgnoreQueryFilters()
                 .Where(s => s.IsDeleted == deleted && s.StatementFileId != null)
                 .WhereIf(filter.BankIds is { Count: > 0 }, s => filter.BankIds!.Contains(s.BankId))
@@ -336,7 +336,7 @@ public sealed class StatementFileRepository(ApplicationDbContext context)
 
     public async Task<StatementFileProjection?> GetProjectionAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var file = await context.StatementFiles
+        var file = await Context.StatementFiles
             .IgnoreQueryFilters()
             .AsNoTracking()
             .FirstOrDefaultAsync(f => f.Id == id, cancellationToken);
@@ -352,7 +352,7 @@ public sealed class StatementFileRepository(ApplicationDbContext context)
 
     public async Task<IReadOnlyList<StatementDto>> GetStatementsAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var statements = await context.Statements
+        var statements = await Context.Statements
             .IgnoreQueryFilters()
             .AsNoTracking()
             .Include(s => s.Bank)
@@ -368,7 +368,7 @@ public sealed class StatementFileRepository(ApplicationDbContext context)
 
     public async Task<IReadOnlyList<UploadHistoryDto>> GetUploadsAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var uploads = await context.UploadHistories
+        var uploads = await Context.UploadHistories
             .IgnoreQueryFilters()
             .AsNoTracking()
             .Where(u => u.StatementFileId == id)
@@ -389,7 +389,7 @@ public sealed class StatementFileRepository(ApplicationDbContext context)
             return PagedResult<TransactionDto>.Empty(pagination.PageNumber, pagination.PageSize);
         }
 
-        return await context.Transactions
+        return await Context.Transactions
             .IgnoreQueryFilters()
             .AsNoTracking()
             .Where(t => t.StatementId != null && statementIds.Contains(t.StatementId.Value))
@@ -407,7 +407,7 @@ public sealed class StatementFileRepository(ApplicationDbContext context)
         int? year,
         CancellationToken cancellationToken = default)
     {
-        var statements = await context.Statements
+        var statements = await Context.Statements
             .AsNoTracking()
             .Where(s => s.StatementFileId != null && s.StatementFile!.IsDeleted == false)
             .WhereIf(bankId.HasValue, s => s.BankId == bankId!.Value)
@@ -449,7 +449,7 @@ public sealed class StatementFileRepository(ApplicationDbContext context)
     }
 
     private IQueryable<Guid> StatementIdsFor(Guid fileId) =>
-        context.Statements
+        Context.Statements
             .IgnoreQueryFilters()
             .Where(s => s.StatementFileId == fileId)
             .Select(s => s.Id);
@@ -470,7 +470,7 @@ public sealed class StatementFileRepository(ApplicationDbContext context)
 
         var fileIds = files.Select(f => f.Id).ToList();
 
-        var statements = await context.Statements
+        var statements = await Context.Statements
             .IgnoreQueryFilters()
             .AsNoTracking()
             .Where(s => s.StatementFileId != null && fileIds.Contains(s.StatementFileId.Value) && s.IsDeleted == deleted)
@@ -488,7 +488,7 @@ public sealed class StatementFileRepository(ApplicationDbContext context)
 
         var statementIds = statements.Select(s => s.Id).ToList();
 
-        var transactionCounts = await context.Transactions
+        var transactionCounts = await Context.Transactions
             .IgnoreQueryFilters()
             .AsNoTracking()
             .Where(t => t.StatementId != null && statementIds.Contains(t.StatementId.Value) && t.IsDeleted == deleted)
@@ -498,7 +498,7 @@ public sealed class StatementFileRepository(ApplicationDbContext context)
 
         var countByStatement = transactionCounts.ToDictionary(c => c.StatementId, c => c.Count);
 
-        var uploads = await context.UploadHistories
+        var uploads = await Context.UploadHistories
             .IgnoreQueryFilters()
             .AsNoTracking()
             .Where(u => u.StatementFileId != null && fileIds.Contains(u.StatementFileId.Value) && u.IsDeleted == deleted)

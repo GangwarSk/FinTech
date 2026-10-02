@@ -15,7 +15,7 @@ export default defineConfig({
     proxy: {
       // Keeps the SPA same-origin in development so no CORS preflight is needed.
       '/api': {
-        target: 'http://localhost:5080',
+        target: 'http://localhost/FintechApi',
         changeOrigin: true,
       },
     },

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 namespace FinanceAudit360.Tests.Api;
 
 /// <summary>
-/// Boots the real API host against a throwaway LocalDB database so routing, authentication,
+/// Boots the real API host against a throwaway PostgreSQL database so routing, authentication,
 /// authorization, validation and the response envelope are all exercised together.
 /// </summary>
 public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
@@ -28,7 +28,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         foreach (var (key, value) in new Dictionary<string, string>
                  {
                      ["ConnectionStrings__DefaultConnection"] =
-                         $"Server=(localdb)\\MSSQLLocalDB;Database={_databaseName};Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True",
+                         $"Host=localhost;Port=5433;Database={_databaseName};Username=postgres;Password=grsk@12345;Include Error Detail=true",
                      ["Jwt__SigningKey"] = "integration-test-signing-key-at-least-32-bytes-long-0001",
                      ["Security__SeedAdminPassword"] = AdminPassword,
                      ["Security__AuthRateLimitPerMinute"] = "10000",
